@@ -1,0 +1,5 @@
+<resources>
+  <string name="app_name">threadHook</string>
+  <string name="start_test">启动</string>
+  <string name="set_stack_size">设置线程栈大小</string>
+</resources>
