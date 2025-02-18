@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     companion object {
         init {
             System.loadLibrary("threadhook")
