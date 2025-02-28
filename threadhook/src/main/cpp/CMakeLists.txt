@@ -27,9 +27,12 @@ add_library(
 
 find_package(shadowhook REQUIRED CONFIG)
 
-# add_library(mylib SHARED mylib.c)
 
-
+message(STATUS "log-lib-lib path: ${log-lib}")
+find_library(
+        unwindstack-lib
+        NAMES unwindstack  # 库名称（不包含前缀lib和后缀.so/.a）
+)
 find_library(
         log-lib
         log)

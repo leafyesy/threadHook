@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.start.setOnClickListener {
-            MySdk.init()
+            MySdk.init(this@MainActivity)
             threadHook.threadHook()
         }
         binding.setThreadStack.setOnClickListener {

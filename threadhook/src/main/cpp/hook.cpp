@@ -242,6 +242,44 @@ int getProcessId() {
     return getpid(); // 获取当前进程 ID
 }
 
+#include <unwind.h>
+#include <dlfcn.h>
+
+// 定义栈帧结构体
+struct stack_frame {
+    void *fp;  // 栈基址（Frame Pointer）
+    void *lr;  // 返回地址（Link Register）
+};
+
+jlong get_stack_usage() {
+    struct stack_frame *frame;
+    void *sp;
+    // 通过汇编指令获取当前 SP 和 FP
+    asm volatile ("mov %0, sp" : "=r"(sp));
+    asm volatile ("mov %0, x29" : "=r"(frame));
+
+    // 计算栈使用量（假设栈向下增长）
+    size_t stack_size = (uintptr_t)frame - (uintptr_t)sp;
+    LOGEP("栈使用量: %zu bytes\n", stack_size);
+    return stack_size;
+}
+
+//#include <libunwind.h>
+//void native_backtrace() {
+//    unw_cursor_t cursor;
+//    unw_context_t context;
+//    unw_getcontext(&context);
+//    unw_init_local(&cursor, &context);
+//    while (unw_step(&cursor) > 0) {
+//        unw_word_t offset, pc;
+//        char sym[256];
+//        unw_get_reg(&cursor, UNW_REG_IP, &pc);
+//        if (unw_get_proc_name(&cursor, sym, sizeof(sym), &offset) == 0) {
+//            LOGEP("PC: 0x%lx, Symbol: %s+0x%lx\n", pc, sym, offset);
+//        }
+//    }
+//}
+
 jlong printThreadStackInfo(long threadId) {
     int pid = getProcessId();
     std::stringstream path;
@@ -276,7 +314,9 @@ Java_com_ysydhc_threadhook_StackSizeUtil_getThreadStackUsage(JNIEnv *env, jobjec
     pid_t tid = syscall(SYS_gettid); // 获取当前线程的线程ID
     // return get_stack_usage(pid,tid);
     // return get_thread_stack_usage(tid);
-    return printThreadStackInfo(tid);
+    // return printThreadStackInfo(tid);
+    // native_backtrace();
+    return get_stack_usage();
 }
 
 extern "C"
@@ -285,4 +325,6 @@ Java_com_ysydhc_threadhook_StackSizeUtil_getTid(JNIEnv *env, jobject thiz) {
   pid_t tid = syscall(SYS_gettid);
   return tid;
 }
+
+
 
